@@ -11,34 +11,51 @@ class WebsocketClient extends Component {
     // eslint-disable-next-line no-useless-constructor
     constructor(props) {
         super(props);
+        this.init = this.init.bind(this);
+        this.handleOpen = this.handleOpen.bind(this);
+        this.handleMessage = this.handleMessage.bind(this);
+        this.handleError = this.handleError.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+
+        this.init();
     }
     
-    componentWillMount = () => {
-        client.onopen = () => {
-          console.log('onopen ===> WebSocket Client Verbunden');
-        };
-        client.onmessage = (message) => {
-          console.log('onmessage ===> Nachricht vom Server: ', message);
-        };
-        client.onerror = (err) => {
-            console.log('onerror ===> Fehler: ', err);
-        };
-        client.onclose = (e) => {
-            console.log('onclose ===> Verbindung wird geschlossen, e: ', e);
-        };
+    init() {
+        client.onopen = this.handleOpen;
+        client.onmessage = this.handleMessage;
+        client.onerror = this.handleError;
+        client.onclose = this.handleClose;
+    }
+
+    handleOpen(msg) {
+        console.log('onopen ===> WebSocket Client Verbunden, ', msg);
+    }
+
+    handleMessage(msg) {
+        console.log('onmessage ===> Nachricht vom Server: ', msg);
+    }
+
+    handleError(msg) {
+        console.log('onerror ===> Fehler: ', msg);
+    }
+
+    handleClose(msg) {
+        console.log('onclose ===> Verbindung wird geschlossen, ', msg);
     }
 
     handleClick = (e) => {
         console.log('handleClick ===> e: ', e);
 
-        client.send(JSON.stringify({
-            type: 'utf8',
-            data: 'Hi von Client!',
-            error: '' // Nur so eine Idee: einfach überall (leeren) error hinzufügen damit man am anderen Ende 
-            // auf empty(error) testen kann. Wenn man das überall einhält wirds einfacher.
-        }));
+        // ArrayBuffers are a good way to allocate space to work in. In the example below I allocate 32 Bytes.
+        // I can then edit it by using one of Uint32Array, Uint16Array, Float32Array to write binary data
+        // to different parts of the ArrayBuffer.
+        let msg = new Int8Array([ 7, 7, 7]); 
+       
+        // The websocket should recieve binary data as ArrayBuffers
+        client.binaryType = 'arraybuffer';
+        client.send(msg);
 
-        this.props.handleClick(e); // Weiter nach oben leiten zur Parent-Component
+        this.props.handleMessage(e); // Weiter nach oben leiten zur Parent-Component
     };
     
     render() {
