@@ -1,10 +1,12 @@
 // eslint-disable-next-line no-unused-vars
 import React, { Component } from 'react';
 import { w3cwebsocket as W3CWebSocket } from "websocket";
+import connect from 'react-redux';
 
 
 
-const client = new W3CWebSocket('ws://127.0.0.1:8888');
+let client = null;
+
 
 
 class WebsocketClient extends Component {
@@ -21,8 +23,16 @@ class WebsocketClient extends Component {
             game_run: 'false',
             name: ''
         }
+    }
 
-        this.initCallbacks();
+    connect = (e) => {
+        client = new W3CWebSocket('ws://127.0.0.1:8888');
+        if(client) {
+            this.initCallbacks();
+        } else {
+            console.error('Verbindung zu Websocket fehlgeschlagen!');
+        }
+        this.props.connect(e);
     }
     
     initCallbacks() {
@@ -33,71 +43,24 @@ class WebsocketClient extends Component {
     }
 
     handleOpen(msg) {
-        console.log('onopen ===> WebSocket Client Verbunden, ', msg);
+        this.props.handleMessage(msg, 'onopen');
     }
 
     handleMessage(msg) {
-        console.log('onmessage ===> Nachricht vom Server: ', msg);
+        this.props.handleMessage(msg, 'onmessage');
     }
 
     handleError(msg) {
-        console.log('onerror ===> Fehler: ', msg);
+        this.props.handleMessage(msg, 'onerror');
     }
 
     handleClose(msg) {
-        console.log('onclose ===> Verbindung wird geschlossen, ', msg);
+        this.props.handleMessage(msg, 'onclose');
     }
 
-    handleInputChange = (e) => {
-        const target = e.target;
-        const value = target.value;
-        const name = target.name;
-        this.setState({
-            [name]: value
-        });
-    }
-
-    handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('handleClick ===> e: ', e);
-        this.setState({
-            game_run: true
-        });
-
-        const msg = {
-            msg_type: 'game_control',
-            payload: {
-                instruction: 'start_game',
-                name: this.state.name
-            }
-        }
-        
-        client.send(JSON.stringify(msg));
-    };
-
-    handleGameStateChange = (e) => {
-        // ArrayBuffers are a good way to allocate space to work in. In the example below I allocate 32 Bytes.
-        // I can then edit it by using one of Uint32Array, Uint16Array, Float32Array to write binary data
-        // to different parts of the ArrayBuffer.
-        let msg = new Int8Array([ 7, 7, 7]); 
-       
-        // The websocket should recieve binary data as ArrayBuffers
-        client.binaryType = 'arraybuffer';
-        client.send(msg);
-    }
-    
     render() {
         return (
-            <>
-                <form onSubmit={this.handleSubmit}>
-                    <label>
-                        Name:
-                        <input type="text"
-                        onChange={this.handleInputChange} />
-                    </label>
-                    <input type="submit" value='Submit' />
-                </form>
-            </>
+            <input type="button" value='Connect' name="connect" onClick={this.connect}/>
         );
     }
 }

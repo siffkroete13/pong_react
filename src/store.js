@@ -1,6 +1,6 @@
-import { createStore, applyMiddleware, combineReducers } from 'redux';
+import { createStore, applyMiddleware, combineReducers, compose } from 'redux';
 import thunk from 'redux-thunk';
-import gameReducer from './reducers/game_reducer';
+import gameReducer from './reducers/gameReducer';
 
 const middleware = [thunk];
 
@@ -12,8 +12,11 @@ const rootReducer = combineReducers({
 
 const store = createStore(
     rootReducer, 
-    initialState, 
-    applyMiddleware(...middleware)
+    initialState,
+    compose(
+        applyMiddleware(...middleware),
+        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    )
 );
 
 export default store;

@@ -1,0 +1,18 @@
+#game_title {
+    text-align: center;
+}
+
+
+#game_content {
+    height: 70vh;
+    padding: 0 3% 0 3%;
+}
+
+.game_header {
+    display: flex;
+}
+
+#player_container {
+    height: 70vh;
+    border: 1px solid black;
+}
