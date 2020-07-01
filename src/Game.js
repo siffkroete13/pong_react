@@ -1,11 +1,11 @@
 // eslint-disable-next-line no-unused-vars
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { gameReducer } from './reducers/gameReducer'
-import WebsocketClient from "./io/websocket_client";
-import StartForm from './io/start-form';
+import { gameReducer } from './reducers/gameReducer';
+import getWebsocketClientInstance from "./io/websocket_client";
 import Player from './player';
 import './css/Game.css';
+import StartForm from './io/start-form';
 import ChatForm from './io/chat-form';
 import {
     MY_PLAYER,
@@ -34,19 +34,15 @@ class Game extends Component {
             ball_state: {},
             paddle_state: {}
         }
+        this.websocketClient = getWebsocketClientInstance();
     }
 
+    websocketClient;
     stopId = 0;
     lastTime = 0;
     deltaTime = 0;
     renderLoopIsRunning = false;
     playerCount = 2;
-
-    handleWebsocketMessage = (msg, type) => {
-        this.setState({
-            connectStatus: type
-        });
-    }
 
     renderLoop = (time = 0) => {
         this.deltaTime = time - this.lastTime;
@@ -74,43 +70,41 @@ class Game extends Component {
         }
     }
 
-    connect = (e) => {
-        this.setState({
-            connectStatus: 'connected'
-        });
+    connectToServer(e) {
+        this.websocketClient.connect();
+        this.websocketClient.onOpen = (e) => {
+            this.websocketClient.onMessage = this.handleMessage;
+            this.websocketClient.onClose = this.handleClose;
+        }
     }
 
-    startGame = (e) => {
-        const msg = {
-            type: 'GAMME_CONTROL_MSG',
-            data: 'START_GAME',
-            dest: this.state.playerNames[FOREIGN_PLAYER]
-        }
-        this.props.startGame(msg); // Dispatch Action for all Components
+    handleMessage = (msg) => {
+        console.log('handleMessage in Game.js');
     }
-      
+
+    startGame = (_msg) => {
+        const msg = {
+            type: 'GAME_CONTROL_MSG',
+            data: 'START_GAME',
+            username: _msg.username
+        }
+        this.websocketClient.send(msg);
+    }
+
+    handleClose = (msg) => {
+
+    }
+
     render() {
         return (
             <div id="game_content">
-                <div id="game_title">{this.props.title} Connect state: {this.state.connectStatus}</div> 
+                <div id="game_title">{this.props.title} Connect state: {this.state.connectionState}</div> 
 
                 <div className="game_header">
                     <ChatForm
                         title="Chat"
-                        playerName={this.state.playerNames[MY_PLAYER]}
-                        class="chat_form" 
-                    />
-
-                    <StartForm 
-                        id="startForm"
-                        title="Spiel Starten"
-                        handleSubmit={this.startGame}
-                    />
-
-                    <ChatForm
-                        title="Chat"
-                        playerName={this.state.playerNames[FOREIGN_PLAYER]}
-                        class="chat_form" 
+                        class="chat_form"
+                        handleSubmit={this.sendMsg}
                     />
                 </div>  {/* End game_header */}
 
@@ -119,10 +113,9 @@ class Game extends Component {
                     <Player id="player_1" playerName={this.state.playerNames[FOREIGN_PLAYER]} />
                 </div>
 
-                <WebsocketClient
-                    connect={this.connect}
-                    handleMessage={this.handleWebsocketMessage}
-                />
+                <input type="button" value='Connect' name="connect" onClick={this.connectToServer}/>
+
+                <StartForm handleSubmit={this.startGame} />
 
             </div>
         );

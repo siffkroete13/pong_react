@@ -6,7 +6,8 @@ class ChatForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: props.playerName
+            field1: '',
+            field2: ''
         }
     }
    
@@ -21,7 +22,11 @@ class ChatForm extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        this.props.handleSubmit();
+        const msg = {
+            type: 'SEND_CHAT_MSG',
+            data: this.state.field1
+        }
+        this.props.handleSubmit(msg);
     };
     
     render() {
@@ -31,8 +36,14 @@ class ChatForm extends Component {
                     <label>
                         <input type="text"
                         onChange={this.handleInputChange}
-                        name="username"
-                        value={this.state.username} />
+                        name="field1"
+                        value={this.state.field1} />
+                    </label>
+                    <label>
+                        <input type="text"
+                        onChange={this.handleInputChange}
+                        name="field2"
+                        value={this.state.field2} />
                     </label>
                     <input type="submit" value="Submit" />
                 </form>

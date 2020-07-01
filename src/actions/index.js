@@ -1,3 +1,7 @@
+import getWebsocketClient from '../io/websocket_client';
+
+const websocketClient = getWebsocketClient();
+
 export const ACTIONS = { 
     START_GAME: 'START_GAME',
     SEND_GAME_CONTROL_MSG : 'SEND_GAME_CONTROL_MSG',
@@ -16,6 +20,7 @@ export const ACTIONS = {
 
 export const MY_PLAYER = 0;
 export const FOREIGN_PLAYER = 1;
+
 
 export const set_left_paddle = (move_object) => ({
     type: ACTIONS.SET_LEFT_PADDLE,
