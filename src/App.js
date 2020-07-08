@@ -8,7 +8,7 @@ function App() {
   return (
     <Provider store={store}>
       <div className="App">
-        <Game title="Pont Game!"/>
+        <Game title="Pong Game!"/>
       </div>
     </Provider>
   );

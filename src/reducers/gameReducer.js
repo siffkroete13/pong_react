@@ -1,13 +1,13 @@
 import {
     ACTIONS,
-    move_left_paddle,
-    move_right_paddle,
-    move_ball,
-    move_object,
-    sendGameControlMsg,
-    sendChatMsg,
-    sendGameData,
-    startGame
+    // move_left_paddle,
+    // move_right_paddle,
+    // move_ball,
+    // move_object,
+    // sendGameControlMsg,
+    // sendChatMsg,
+    // sendGameData,
+    // startGame
 } from '../actions/';
 
 const initialState = {

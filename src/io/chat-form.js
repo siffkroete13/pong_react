@@ -22,11 +22,7 @@ class ChatForm extends Component {
 
     handleSubmit = (e) => {
         e.preventDefault();
-        const msg = {
-            type: 'SEND_CHAT_MSG',
-            data: this.state.field1
-        }
-        this.props.handleSubmit(msg);
+        this.props.handleSubmit(this.state.field1);
     };
     
     render() {

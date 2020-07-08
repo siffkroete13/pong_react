@@ -1,9 +1,9 @@
-import getWebsocketClient from '../io/websocket_client';
-
-const websocketClient = getWebsocketClient();
+// import getWebsocketClient from '../io/websocket_client';
+// const websocketClient = getWebsocketClient();
 
 export const ACTIONS = { 
-    START_GAME: 'START_GAME',
+    START_GAME: 'START_GAME', // Anfrage nach Game-Start
+    GAME_STARTED: 'GAME_STARTED', // Antwort vom Gegner, jetzt gehts erst los
     SEND_GAME_CONTROL_MSG : 'SEND_GAME_CONTROL_MSG',
     RECEIVE_GAME_CONTROL_MSG : 'RECEIVE_GAME_CONTROL_MSG',
     SEND_CHAT_MSG : 'SEND_CHAT_MSG',

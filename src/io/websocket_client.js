@@ -7,7 +7,6 @@ let instance = null;
 
 class WebsocketClient {
     onConnect = null;
-    onOpen = null;
     onMessage = null;
     onClose = null;
 
@@ -15,70 +14,62 @@ class WebsocketClient {
         if(!instance) {
             instance = this;
         }
-        instance.init();
         return instance;
     }
 
-    init() {
-        this.initCallbacks = this.initCallbacks.bind(this);
-        this.handleOpen = this.handleOpen.bind(this);
-        this.handleMessage = this.handleMessage.bind(this);
-        this.handleError = this.handleError.bind(this);
-        this.handleClose = this.handleClose.bind(this);
-    }
-
-    connect = (e) => {
-        if(!client) {
-            client = new W3CWebSocket('ws://127.0.0.1:8888');
-        }
-        
-        if(client) {
-            this.initCallbacks();
-        } else {
-            console.error('Verbindung zu Websocket fehlgeschlagen!');
-        }
-
-
-        if(client && this.onConnect) {
-            // Den Besitzer dieses Objekts Informieren
-            this.onConnect(e);
+    connect = () => {
+        try {
+            if(client === undefined || client === null) {
+                client = new W3CWebSocket('ws://127.0.0.1:8888');
+            }
+            if(client) this.initCallbacks();
+        } catch (err) {
+            console.error('Fehler bei WebsocketClient::connect(), err: ', err);
         }
     }
 
-    send = (msg) => {
-        client.send(msg);
-    }
-    
-    initCallbacks() {
+    initCallbacks = () => {
         client.onopen = this.handleOpen;
         client.onmessage = this.handleMessage;
         client.onerror = this.handleError;
         client.onclose = this.handleClose;
     }
 
-    handleOpen(msg) {
-        console.log('handleOpen() aufgerufen, msg', msg);
-        if(client && this.onMessage) {
+    sendUtf8 = (msg) => {
+        client.send(JSON.stringify(msg));
+    }
+
+    sendBinary = (msg) => {
+        client.send(msg);
+    }
+
+    handleOpen = (msg) => {
+        // console.log('handleOpen() aufgerufen, msg', msg);
+        if(client && this.onConnect) {
             // Den Besitzer dieses Objekts Informieren
-            this.onOpen(msg);
+            this.onConnect(msg);
         }
     }
 
-    handleMessage(msg) {
-        console.log('handleMessage() aufgerufen, msg', msg);
+    handleMessage = (msg) => {
+        // console.log('handleMessage() aufgerufen, msg', msg);
         if(client && this.onMessage) {
             // Den Besitzer dieses Objekts Informieren
             this.onMessage(msg);
         }
     }
 
-    handleError(msg) {
-        console.log('handleError() aufgerufen, msg', msg);
+    handleError = (msg) => {
+        // console.log('handleError() aufgerufen, msg', msg);
+        if(client && this.onError) {
+            // Den Besitzer dieses Objekts Informieren
+            this.onError(msg);
+        }
     }
 
-    handleClose(msg) {
-        console.log('handleClose() aufgerufen, msg', msg);
-        if(client && this.onMessage) {
+    handleClose = (msg) => {
+        // console.log('client::handleClose() aufgerufen, msg', msg);
+        if(client && this.onClose) {
             // Den Besitzer dieses Objekts Informieren
             this.onClose(msg);
         }
@@ -88,6 +79,7 @@ class WebsocketClient {
 
 
 export default function getWebsocketClientInstance() {
+    if(instance) return instance;
     return new WebsocketClient();
 }
 

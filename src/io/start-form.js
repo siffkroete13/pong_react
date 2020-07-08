@@ -6,7 +6,7 @@ class StartForm extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            username: 'Spielername'
+            username: 'Spieler A'
         }
     }
 
@@ -20,7 +20,7 @@ class StartForm extends Component {
 
     startGame = (e) => {
         e.preventDefault();
-        this.props.handleSubmit(e);
+        this.props.handleSubmit(this.state.username);
     };
     
     render() {
